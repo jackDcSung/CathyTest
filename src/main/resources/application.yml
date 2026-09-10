@@ -8,7 +8,26 @@ server:
 spring:
   application:
     name: coindesk
-
-logging:
-  level:
-    com.cathay.coindesk: INFO
+  datasource:
+    # DB_CLOSE_DELAY=-1：H2 in-memory DB 預設在最後一個連線關閉時就消滅，
+    # 指定 -1 讓它存活到 JVM 結束，避免連線池回收連線時整個資料庫被清掉。
+    url: jdbc:h2:mem:coindesk;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    # schema 由 schema.sql 建立，避免 Hibernate 自動產生的定義與 SQL 互相衝突
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    # 關閉 OSIV，讓 lazy loading 問題在 Service 層就暴露，不會拖到 view render 才出現
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      encoding: UTF-8
