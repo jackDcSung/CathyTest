@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: coindesk
+
+logging:
+  level:
+    com.cathay.coindesk: INFO
