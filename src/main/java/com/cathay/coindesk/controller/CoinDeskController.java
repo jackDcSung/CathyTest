@@ -1,6 +1,7 @@
 package com.cathay.coindesk.controller;
 
 import com.cathay.coindesk.client.CoinDeskResponse;
+import com.cathay.coindesk.dto.CoinDeskRateResponse;
 import com.cathay.coindesk.service.CoinDeskService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +23,11 @@ public class CoinDeskController {
     @GetMapping("/original")
     public CoinDeskResponse getOriginal() {
         return coinDeskService.getOriginalData();
+    }
+
+    // 轉換後的版本：更新時間格式化，並補上取自幣別對照表的中文名稱。
+    @GetMapping("/converted")
+    public CoinDeskRateResponse getConverted() {
+        return coinDeskService.getConvertedData();
     }
 }
