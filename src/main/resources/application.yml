@@ -31,3 +31,10 @@ spring:
       schema-locations: classpath:schema.sql
       data-locations: classpath:data.sql
       encoding: UTF-8
+
+# 外部服務的位址與逾時皆為設定值，換環境或改走內部 gateway 時不需要動程式碼。
+coindesk:
+  api:
+    url: https://kengp3.github.io/blog/coindesk.json
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000

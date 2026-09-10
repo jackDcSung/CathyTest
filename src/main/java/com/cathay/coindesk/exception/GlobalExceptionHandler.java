@@ -41,6 +41,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return build(ErrorCode.CURRENCY_ALREADY_EXISTS, ex.getMessage(), request.getRequestURI());
     }
 
+    // 外部相依失敗不是本系統的錯，回 502 讓呼叫端能區分「上游掛了」與「我們壞了」。
+    @ExceptionHandler(CoinDeskClientException.class)
+    public ResponseEntity<ErrorResponse> handleCoinDeskClient(CoinDeskClientException ex,
+                                                              HttpServletRequest request) {
+        return build(ErrorCode.COINDESK_UNAVAILABLE, ex.getMessage(), request.getRequestURI());
+    }
+
     // 保底處理。完整堆疊只寫進 log，對外固定回一句話，
     // 避免把內部類別名稱、SQL、檔案路徑等細節洩漏給呼叫端。
     @ExceptionHandler(Exception.class)

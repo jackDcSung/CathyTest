@@ -3,3 +3,10 @@ spring:
     url: jdbc:h2:mem:coindesk-test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
   jpa:
     show-sql: false
+
+# 測試不連外網，此 URL 只用來讓 MockRestServiceServer 比對請求
+coindesk:
+  api:
+    url: https://coindesk.test/coindesk.json
+    connect-timeout-ms: 1000
+    read-timeout-ms: 1000
