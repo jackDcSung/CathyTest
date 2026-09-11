@@ -34,8 +34,12 @@ public class CoinDeskClient {
         } catch (RestClientException ex) {
             // RestTemplate 會把連線逾時、非 2xx 與下行內容解析失敗一律包成 RestClientException，
             // 因此這一個 catch 就涵蓋所有外部呼叫的失敗情境。
+            //
+            // 對外訊息刻意不帶 ex.getMessage()：非 2xx 時它會夾帶上游的完整回應內容，
+            // 直接回給呼叫端等於外洩上游資訊，也會讓錯誤回應暴增到數 KB。
+            // 完整原因保留在 log 與 cause 裡，除錯能力不受影響。
             log.error("呼叫 CoinDesk 失敗, url={}", apiUrl, ex);
-            throw new CoinDeskClientException("呼叫 CoinDesk 失敗: " + ex.getMessage(), ex);
+            throw new CoinDeskClientException("呼叫 CoinDesk 失敗", ex);
         }
     }
 }

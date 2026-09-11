@@ -17,6 +17,8 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -95,6 +97,24 @@ class CoinDeskClientTest {
                 });
 
         assertThrows(CoinDeskClientException.class, () -> coinDeskClient.getCurrentPrice());
+    }
+
+    // 回歸測試：非 2xx 時 RestClientException 的訊息會夾帶上游的完整 response body，
+    // 若直接串進對外訊息就會外洩上游資訊。這裡確保對外訊息乾淨、細節只留在 cause。
+    @Test
+    @DisplayName("shouldNotExposeUpstreamResponseBodyInExceptionMessage")
+    void shouldNotExposeUpstreamResponseBodyInExceptionMessage() {
+        String upstreamSecret = "internal-host-should-not-leak";
+        server.expect(requestTo(API_URL))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND)
+                        .contentType(MediaType.TEXT_HTML)
+                        .body("<html>" + upstreamSecret + "</html>"));
+
+        CoinDeskClientException ex = assertThrows(CoinDeskClientException.class,
+                () -> coinDeskClient.getCurrentPrice());
+
+        assertFalse(ex.getMessage().contains(upstreamSecret));
+        assertNotNull(ex.getCause());
     }
 
     // 對應 CoinDeskClient 內的 null 檢查：getForObject 在 204 無內容時會回傳 null。
